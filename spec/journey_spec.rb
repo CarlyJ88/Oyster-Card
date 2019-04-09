@@ -7,18 +7,27 @@ describe Journey do
   end
 
   describe '#touch_in' do
-    it { is_expected.to respond_to :touch_in }
-
     it 'shows user has started a journey' do
+      min_fare = Journey::MINFARE
+      subject.instance_variable_set(:@balance, min_fare)
+      subject.touch_in
       expect(subject.touch_in).to eq true
+    end
+
+    it 'raises error if insufficient funds touch in' do
+      expect { subject.touch_in }.to raise_error 'Insufficient funds'
     end
   end
 
   describe '#touch_out' do
-    it { is_expected.to respond_to :touch_out }
-
     it 'shows user has ended journey' do
       expect(subject.touch_out).to eq false
+    end
+
+    it 'deducts money from users card' do
+      min_fare = Journey::MINFARE
+      subject.instance_variable_set(:@balance, min_fare)
+      expect{ subject.touch_out }.to change{ subject.balance }.by -min_fare
     end
   end
 end
